@@ -45,13 +45,13 @@ fun NoteEntryScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 OutlinedTextField(
-                    value = noteUiState.noteDetails.title,
+                    value = noteUiState.noteDetails?.title ?: "", // Manejo de nulos
                     onValueChange = { newTitle: String -> viewModel.updateTitle(newTitle) },
                     label = { Text("Title") },
                     modifier = Modifier.padding(16.dp)
                 )
                 OutlinedTextField(
-                    value = noteUiState.noteDetails.content,
+                    value = noteUiState.noteDetails?.content ?: "", // Manejo de nulos
                     onValueChange = { newContent: String -> viewModel.updateContent(newContent) },
                     label = { Text("Content") },
                     modifier = Modifier.padding(16.dp)
@@ -61,7 +61,7 @@ fun NoteEntryScreen(
                         viewModel.saveNote()
                         navigateBack()
                     },
-                    enabled = noteUiState.isEntryValid,
+                    enabled = noteUiState.noteDetails?.isEntryValid() == true, // Validar entrada
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text("Save Note")
@@ -75,6 +75,6 @@ fun NoteEntryScreen(
 @Composable
 fun NoteEntryScreenPreview() {
     InventoryTheme {
-        NoteEntryScreen(navigateBack = { /*Do nothing*/ })
+        NoteEntryScreen(navigateBack = { /* Do nothing */ })
     }
 }

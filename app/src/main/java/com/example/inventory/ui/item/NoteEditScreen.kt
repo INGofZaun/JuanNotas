@@ -8,15 +8,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.inventory.InventoryTopAppBar
 import com.example.inventory.R
 import com.example.inventory.ui.AppViewModelProvider
-import com.example.inventory.ui.theme.InventoryTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +26,14 @@ fun NoteEditScreen(
     modifier: Modifier = Modifier,
     viewModel: NoteEditViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    // Cargar la nota cuando se inicia la pantalla
+    LaunchedEffect(noteId) {
+        viewModel.loadNote(noteId)
+    }
+
+    // Obtener el estado actual de la nota
+    val noteUiState = viewModel.noteUiState.collectAsState().value
+
     Scaffold(
         topBar = {
             InventoryTopAppBar(
@@ -37,12 +45,11 @@ fun NoteEditScreen(
         modifier = modifier
     ) { innerPadding ->
         NoteEntryBody(
-            noteUiState = viewModel.noteUiState,
+            noteUiState = noteUiState,
             onTitleChange = viewModel::updateTitle,
             onContentChange = viewModel::updateContent,
             onSaveClick = {
-                viewModel.saveNote()
-                navigateBack()
+                viewModel.saveNoteAndNavigate(navigateBack)
             },
             modifier = Modifier
                 .padding(
@@ -54,5 +61,3 @@ fun NoteEditScreen(
         )
     }
 }
-
-

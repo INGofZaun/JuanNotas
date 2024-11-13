@@ -9,78 +9,39 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel para gestionar y guardar los datos de una nota nueva.
- */
 class NoteEntryViewModel(
     private val notesRepository: NotesRepository
 ) : ViewModel() {
 
-    // Estado de la UI para entrada de notas.
     private val _noteUiState = MutableStateFlow(NoteUiState())
     val noteUiState: StateFlow<NoteUiState> = _noteUiState.asStateFlow()
 
-    /**
-     * Actualiza el título en el estado actual de la nota.
-     */
     fun updateTitle(newTitle: String) {
+        val currentNoteDetails = _noteUiState.value.noteDetails ?: NoteDetails() // Proporciona un valor predeterminado
         _noteUiState.value = _noteUiState.value.copy(
-            noteDetails = _noteUiState.value.noteDetails.copy(title = newTitle),
-            isEntryValid = validateInput(newTitle, _noteUiState.value.noteDetails.content)
+            noteDetails = currentNoteDetails.copy(title = newTitle),
+            isEntryValid = validateInput(newTitle, currentNoteDetails.content)
         )
     }
 
-    /**
-     * Actualiza el contenido en el estado actual de la nota.
-     */
     fun updateContent(newContent: String) {
+        val currentNoteDetails = _noteUiState.value.noteDetails ?: NoteDetails() // Proporciona un valor predeterminado
         _noteUiState.value = _noteUiState.value.copy(
-            noteDetails = _noteUiState.value.noteDetails.copy(content = newContent),
-            isEntryValid = validateInput(_noteUiState.value.noteDetails.title, newContent)
+            noteDetails = currentNoteDetails.copy(content = newContent),
+            isEntryValid = validateInput(currentNoteDetails.title, newContent)
         )
     }
 
-    /**
-     * Valida que el título y el contenido no estén vacíos.
-     */
     private fun validateInput(title: String, content: String): Boolean {
         return title.isNotBlank() && content.isNotBlank()
     }
 
-    /**
-     * Guarda la nota en el repositorio si la entrada es válida.
-     */
     fun saveNote() {
-        if (_noteUiState.value.isEntryValid) {
+        val noteDetails = _noteUiState.value.noteDetails
+        if (_noteUiState.value.isEntryValid && noteDetails != null) {
             viewModelScope.launch {
-                notesRepository.insertNote(_noteUiState.value.noteDetails.toNote())
+                notesRepository.insertNote(noteDetails.toNote())
             }
         }
     }
 }
-
-/**
- * Estado de la UI para la pantalla de entrada de notas.
- */
-data class NoteUiState(
-    val noteDetails: NoteDetails = NoteDetails(),
-    val isEntryValid: Boolean = false
-)
-
-/**
- * Clase para representar los detalles de una nota.
- */
-data class NoteDetails(
-    val id: Int = 0,
-    val title: String = "",
-    val content: String = ""
-)
-
-/**
- * Convierte un objeto `NoteDetails` a `Note`.
- */
-fun NoteDetails.toNote(): Note = Note(
-    id = id,
-    title = title,
-    content = content
-)

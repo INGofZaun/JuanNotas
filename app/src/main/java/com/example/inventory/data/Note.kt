@@ -14,7 +14,12 @@ data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,           // Título de la nota
     val content: String          // Contenido de la nota
-)
+) {
+    // Función para verificar si la entrada es válida
+    fun isEntryValid(): Boolean {
+        return title.isNotBlank() && content.isNotBlank()
+    }
+}
 
 @Dao
 interface NoteDao {
