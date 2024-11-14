@@ -29,24 +29,30 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = "17"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.4"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     namespace = "com.example.inventory"
 }
 
@@ -66,6 +72,11 @@ dependencies {
     implementation("androidx.room:room-runtime:${rootProject.extra["room_version"]}")
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.room:room-ktx:${rootProject.extra["room_version"]}")
+
+    // Multimedia dependencies
+    implementation("com.google.android.exoplayer:exoplayer:2.15.1")
+    implementation("io.coil-kt:coil-compose:2.1.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.21.0-beta")
 
     // Testing
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
