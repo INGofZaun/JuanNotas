@@ -38,15 +38,18 @@ class NoteViewModel @Inject constructor(
         savedStateHandle.get<String>("id")?.let {
             val id = it.toInt()
             viewModelScope.launch {
+                // Obtener los datos de la nota y multimedia
                 repository.getNoteById(id)?.let { note ->
+                    val multimediaUris = repository.getMultimediaForNote(id)
                     _state.update { screenState ->
                         screenState.copy(
                             id = note.id,
                             title = note.title,
                             content = note.content,
                             tipo = note.tipo,
-                            fecha= note.fecha,
-                            foto = note.foto
+                            fecha = note.fecha,
+                            multimedia = multimediaUris,
+                            multimediaTemp = emptyList() // Limpia la multimedia temporal
                         )
                     }
                 }
@@ -54,42 +57,25 @@ class NoteViewModel @Inject constructor(
         }
     }
 
+
     fun onEvent(event: NoteEvent) {
-        var listaU : List<String> = listOf()
         when (event) {
             is NoteEvent.ContentChange -> {
-                _state.update {
-                    it.copy(
-                        content = event.value
-                    )
-                }
+                _state.update { it.copy(content = event.value) }
             }
             is NoteEvent.TipoCambio -> {
-            _state.update {
-                it.copy(
-                    tipo = event.value
-                )
+                _state.update { it.copy(tipo = event.value) }
             }
-        }
-            is NoteEvent.FotoCambio -> {
-                listaU = event.value
+            is NoteEvent.MultimediaCambio -> {
+                // Agrega multimedia temporal
+                _state.update { it.copy(multimediaTemp = it.multimediaTemp + event.value) }
             }
             is NoteEvent.FechaCambio -> {
-                _state.update {
-                    it.copy(
-                        fecha = event.value
-                    )
-                }
+                _state.update { it.copy(fecha = event.value) }
             }
-
             is NoteEvent.TitleChange -> {
-                _state.update {
-                    it.copy(
-                        title = event.value
-                    )
-                }
+                _state.update { it.copy(title = event.value) }
             }
-
             NoteEvent.NavigateBack -> sendEvent(UiEvent.NavigateBack)
             NoteEvent.Save -> {
                 viewModelScope.launch {
@@ -99,23 +85,21 @@ class NoteViewModel @Inject constructor(
                         title = state.title,
                         content = state.content,
                         tipo = state.tipo,
-                        fecha= state.fecha,
-                        foto = state.foto
+                        fecha = state.fecha,
+                        multimedia = state.multimedia + state.multimediaTemp // Combina multimedia
                     )
                     if (state.id == null) {
-                        val id = repository.insertNote(note)
-                        //listaU.forEach{uri->
-                          //  repository.insertFoto(id,uri)
-                        //}
-                        Log.d("-------------------------","SI JALOOO"+id)
+                        repository.insertNote(note)
+                        Log.d("NoteViewModel", "Note inserted successfully.")
                     } else {
                         repository.updateNote(note)
+                        Log.d("NoteViewModel", "Note updated successfully.")
                     }
-
+                    // Limpia la multimedia temporal después de guardar
+                    _state.update { it.copy(multimediaTemp = emptyList()) }
                     sendEvent(UiEvent.NavigateBack)
                 }
             }
-
             NoteEvent.DeleteNote -> {
                 viewModelScope.launch {
                     val state = state.value
@@ -124,12 +108,13 @@ class NoteViewModel @Inject constructor(
                         title = state.title,
                         content = state.content,
                         tipo = state.tipo,
-                        fecha= state.fecha,
-                        foto = state.foto
+                        fecha = state.fecha,
+                        multimedia = state.multimedia
                     )
                     repository.deleteNote(note)
+                    Log.d("NoteViewModel", "Note deleted successfully.")
+                    sendEvent(UiEvent.NavigateBack)
                 }
-                sendEvent(UiEvent.NavigateBack)
             }
         }
     }

@@ -54,7 +54,8 @@ android {
 dependencies {
 
     //Coil
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.3.0")
+    implementation ("androidx.compose.foundation:foundation:1.5.0")
 
     // Icons
     implementation("androidx.compose.material:material-icons-extended:1.3.1")
@@ -92,6 +93,9 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
 
+    implementation ("com.google.code.gson:gson:2.8.8")
+
+
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
     implementation("androidx.activity:activity-compose:1.6.1")
@@ -107,4 +111,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation ("androidx.compose.material:material-icons-extended:1.5.0")
+
 }
