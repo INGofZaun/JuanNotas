@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.collect
 class MainActivity : ComponentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
