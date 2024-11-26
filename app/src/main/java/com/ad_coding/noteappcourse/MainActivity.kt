@@ -37,6 +37,10 @@ import com.ad_coding.noteappcourse.ui.util.Route
 import com.ad_coding.noteappcourse.ui.util.UiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import android.content.SharedPreferences
+import android.net.Uri
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.ad_coding.noteappcourse.ui.screen.note.MediaViewerScreen
 import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
@@ -90,13 +94,27 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         NoteScreen(
-                            estadoFecha,
+                            estadoFecha = estadoFecha,
                             alarmScheduler = AlarmSchedulerImpl(applicationContext),
                             state = state,
-                            onEvent = viewModel::onEvent
+                            onEvent = viewModel::onEvent,
+                            navController = navController
                         )
+
                     }
+
+                    // Nueva ruta para visualizar multimedia
+                    composable(
+                        route = "media_viewer/{uri}",
+                        arguments = listOf(navArgument("uri") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val uri = Uri.decode(backStackEntry.arguments?.getString("uri") ?: "")
+                        MediaViewerScreen(uri = uri)
+                    }
+
+
                 }
+
             }
         }
         // Inicializa sharedPreferences
@@ -204,4 +222,6 @@ class MainActivity : ComponentActivity() {
         private const val PERMISSION_REQUEST_CODE = 100
         private const val NOTIFICATION_ID = 1
     }
+
+
 }

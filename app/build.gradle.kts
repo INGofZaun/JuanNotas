@@ -53,6 +53,19 @@ android {
 
 dependencies {
 
+    implementation ("androidx.compose.ui:ui:1.x.x")
+    implementation ("androidx.compose.material3:material3:1.x.x")
+
+    // Glide para manejar imágenes
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    implementation("androidx.compose.foundation:foundation-layout-android:1.6.0-alpha08")
+    kapt ("com.github.bumptech.glide:compiler:4.15.1")
+
+    implementation("androidx.compose.ui:ui:1.6.0")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha11")
+
+
+
     //Coil
     implementation("io.coil-kt:coil-compose:2.3.0")
     implementation ("androidx.compose.foundation:foundation:1.5.0")

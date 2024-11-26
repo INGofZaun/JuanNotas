@@ -2,6 +2,9 @@
 
 package com.ad_coding.noteappcourse.ui.screen.note
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +43,9 @@ import com.ad_coding.noteappcourse.componentes.MultimediaPicker
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
-
+import androidx.compose.material.icons.filled.AudioFile
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +56,9 @@ fun NoteScreen(
     alarmScheduler: AlarmScheduler,
     state: NoteState,
     onEvent: (NoteEvent) -> Unit,
+    navController: NavController // Acepta navController como parámetro
 ) {
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -106,18 +113,40 @@ fun NoteScreen(
                                     modifier = Modifier
                                         .size(100.dp)
                                         .padding(5.dp)
+                                        .clickable {
+                                            navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
+
+                                        }
                                 )
                             }
                             multimediaUri.startsWith("content://media/external/video") -> {
                                 Icon(
                                     imageVector = Icons.Filled.Movie,
                                     contentDescription = "Video",
-                                    modifier = Modifier.size(50.dp)
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .clickable {
+                                            navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
+
+                                        }
+                                )
+                            }
+                            multimediaUri.startsWith("content://media/external/audio") -> {
+                                Icon(
+                                    imageVector = Icons.Filled.AudioFile,
+                                    contentDescription = "Audio",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .clickable {
+                                            navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
+
+                                        }
                                 )
                             }
                         }
                     }
                 }
+
             }
 
             // Mostrar multimedia temporal
@@ -188,3 +217,22 @@ fun NoteScreen(
         }
     }
 }
+
+@Composable
+fun onMediaClick(uri: String) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(Uri.parse(uri), getMimeType(uri))
+    }
+    LocalContext.current.startActivity(intent)
+}
+
+// Determinar el tipo MIME del archivo
+fun getMimeType(uri: String): String {
+    return when {
+        uri.endsWith(".jpg") || uri.endsWith(".png") -> "image/*"
+        uri.endsWith(".mp4") -> "video/*"
+        uri.endsWith(".mp3") -> "audio/*"
+        else -> "*/*"
+    }
+}
+
