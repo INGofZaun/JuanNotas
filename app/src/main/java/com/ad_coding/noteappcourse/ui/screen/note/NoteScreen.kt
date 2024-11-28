@@ -46,10 +46,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import java.io.File
+import android.graphics.BitmapFactory
+import coil.compose.rememberImagePainter
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-// Agregar una sección en NoteScreen para mostrar multimedia
 @Composable
 fun NoteScreen(
     estadoFecha: EstadoFecha,
@@ -58,7 +62,6 @@ fun NoteScreen(
     onEvent: (NoteEvent) -> Unit,
     navController: NavController // Acepta navController como parámetro
 ) {
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -90,7 +93,10 @@ fun NoteScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 MultimediaPicker(onEvent)
-                CameraButton()
+                CameraButton { uri ->
+                    // Esta es la función que se ejecutará cuando se capture un multimedia
+                    onEvent(NoteEvent.AddMultimedia(uri))
+                }
                 DatePickerFecha(estadoFecha, onEvent)
             }
             AudioRecorderButton()
@@ -106,16 +112,32 @@ fun NoteScreen(
                 ) {
                     items(state.multimedia) { multimediaUri ->
                         when {
-                            multimediaUri.startsWith("content://media/external/images") -> {
+                            multimediaUri.startsWith("file://") -> {
+                                // Para imágenes capturadas con la cámara
+                                val file = File(multimediaUri.removePrefix("file://"))
+                                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
                                 androidx.compose.foundation.Image(
-                                    painter = rememberAsyncImagePainter(model = multimediaUri),
+                                    painter = rememberImagePainter(bitmap),
                                     contentDescription = "Imagen de la nota",
                                     modifier = Modifier
                                         .size(100.dp)
                                         .padding(5.dp)
                                         .clickable {
                                             navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
-
+                                        }
+                                )
+                            }
+                            multimediaUri.startsWith("content://media/external/images") -> {
+                                // Para imágenes de la galería
+                                androidx.compose.foundation.Image(
+                                    painter = rememberAsyncImagePainter(model = multimediaUri),
+                                    contentDescription = "Imagen de la galería",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(5.dp)
+                                        .clickable {
+                                            navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
                                         }
                                 )
                             }
@@ -127,7 +149,6 @@ fun NoteScreen(
                                         .size(50.dp)
                                         .clickable {
                                             navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
-
                                         }
                                 )
                             }
@@ -139,14 +160,12 @@ fun NoteScreen(
                                         .size(50.dp)
                                         .clickable {
                                             navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
-
                                         }
                                 )
                             }
                         }
                     }
                 }
-
             }
 
             // Mostrar multimedia temporal
@@ -160,6 +179,18 @@ fun NoteScreen(
                 ) {
                     items(state.multimediaTemp) { multimediaUri ->
                         when {
+                            multimediaUri.startsWith("file://") -> {
+                                val file = File(multimediaUri.removePrefix("file://"))
+                                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
+                                androidx.compose.foundation.Image(
+                                    painter = rememberImagePainter(bitmap),
+                                    contentDescription = "Nueva imagen",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(5.dp)
+                                )
+                            }
                             multimediaUri.startsWith("content://media/external/images") -> {
                                 androidx.compose.foundation.Image(
                                     painter = rememberAsyncImagePainter(model = multimediaUri),
@@ -218,6 +249,9 @@ fun NoteScreen(
     }
 }
 
+
+
+
 @Composable
 fun onMediaClick(uri: String) {
     val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -229,7 +263,7 @@ fun onMediaClick(uri: String) {
 // Determinar el tipo MIME del archivo
 fun getMimeType(uri: String): String {
     return when {
-        uri.endsWith(".jpg") || uri.endsWith(".png") -> "image/*"
+        uri.endsWith(".jpg") || uri.endsWith(".jpg") -> "image/*"
         uri.endsWith(".mp4") -> "video/*"
         uri.endsWith(".mp3") -> "audio/*"
         else -> "*/*"
