@@ -17,6 +17,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import com.ad_coding.noteappcourse.Alarma.AlarmItem
+import com.ad_coding.noteappcourse.Alarma.AlarmSchedulerImpl
 import com.ad_coding.noteappcourse.ViewModel.EstadoFecha
 import com.ad_coding.noteappcourse.ui.screen.note.NoteEvent
 import java.time.LocalDateTime
@@ -47,6 +49,7 @@ fun DatePickerFecha(
                 TimePickerDialog(context, { _, hourOfDay, minute ->
                     // Combinar fecha y hora
                     val fechaConHora = fechaTemporal.withHour(hourOfDay).withMinute(minute)
+                    val zonedDateTime = fechaConHora.atZone(ZoneId.systemDefault()) // Asegura que se respete la zona horaria
 
                     // Formatear fecha y hora
                     val formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
@@ -55,6 +58,10 @@ fun DatePickerFecha(
                     // Actualizar la variable 'date' y programar la alarma
                     date = fechaConHora.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
 
+                    // Llamar al programa de alarma
+                    val alarmItem = AlarmItem(fechaConHora, "Revisa tus tareas pendientes.")
+                    val alarmScheduler = AlarmSchedulerImpl(context)
+                    alarmScheduler.schedule(alarmItem)
 
                 }, fechaTemporal.hour, fechaTemporal.minute, true).show()
 
@@ -66,10 +73,9 @@ fun DatePickerFecha(
 
         Text(text = "Fecha: $date")
         onEvent(NoteEvent.FechaCambio(date))
-
     }
-
 }
+
 
 private fun scheduleAlarm(context: Context, year: Int, month: Int, day: Int) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
