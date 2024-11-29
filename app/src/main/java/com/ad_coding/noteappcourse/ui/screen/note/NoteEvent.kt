@@ -1,5 +1,7 @@
 package com.ad_coding.noteappcourse.ui.screen.note
 
+import android.net.Uri
+
 sealed class NoteEvent {
     data class TitleChange(val value: String) : NoteEvent()
     data class ContentChange(val value: String) : NoteEvent()
@@ -9,4 +11,6 @@ sealed class NoteEvent {
     object Save : NoteEvent()
     object DeleteNote : NoteEvent()
     object NavigateBack : NoteEvent()
+    data class MultimediaDeCamera(val uri: String) : NoteEvent()
+    data class AddMultimedia(val uri: String) : NoteEvent()
 }

@@ -33,10 +33,10 @@ fun List<String>.toMultimediaEntities(idNota: Int): List<MultimediaEntity> = thi
         idNota = idNota,
         uri = uri,
         tipo = when {
-            uri.endsWith(".jpg", true) || uri.endsWith(".png", true) -> "image" // Imágenes
-            uri.endsWith(".mp4", true) -> "video" // Videos
-            uri.endsWith(".mp3", true) -> "audio" // Audios
-            else -> "unknown" // Tipo desconocido
+            uri.endsWith(".jpg", true) || uri.endsWith(".png", true) || uri.endsWith(".jpeg", true) -> "image"
+            uri.endsWith(".mp4", true) || uri.endsWith(".avi", true) || uri.endsWith(".mkv", true) -> "video"
+            uri.endsWith(".mp3", true) || uri.endsWith(".wav", true) -> "audio"
+            else -> "unknown"
         }
     )
 }

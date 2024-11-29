@@ -67,21 +67,21 @@ fun MultimediaPicker(
             Icon(Icons.Filled.PermMedia, contentDescription = "Seleccionar Multimedia")
         }
 
-//        LazyColumn(modifier = Modifier.height(150.dp)) {
-//            items(multimediaUris) { uri ->
-//                Image(
-//                    painter = rememberAsyncImagePainter(model = Uri.parse(uri)),
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .width(100.dp)
-//                        .height(150.dp)
-//                        .clickable {
-//                            selectedUri = Uri.parse(uri)
-//                            showDeleteDialog = true
-//                        }
-//                )
-//            }
-//        }
+        LazyColumn(modifier = Modifier.height(150.dp)) {
+            items(multimediaUris) { uri ->
+                Image(
+                    painter = rememberAsyncImagePainter(model = Uri.parse(uri)),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(150.dp)
+                        .clickable {
+                            selectedUri = Uri.parse(uri)
+                            showDeleteDialog = true
+                        }
+                )
+            }
+        }
 
         if (showDialogForSelection) {
             AlertDialog(

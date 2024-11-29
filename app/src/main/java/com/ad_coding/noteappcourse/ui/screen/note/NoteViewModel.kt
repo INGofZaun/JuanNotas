@@ -34,6 +34,16 @@ class NoteViewModel @Inject constructor(
         }
     }
 
+    // Función para clasificar el tipo de multimedia
+    private fun classifyMultimediaType(uri: String): String {
+        return when {
+            uri.startsWith("content://media/external/images") -> "image"
+            uri.startsWith("content://media/external/video") -> "video"
+            uri.startsWith("content://media/external/audio") -> "audio"
+            else -> "unknown"
+        }
+    }
+
     init {
         savedStateHandle.get<String>("id")?.let {
             val id = it.toInt()
@@ -41,6 +51,7 @@ class NoteViewModel @Inject constructor(
                 // Obtener los datos de la nota y multimedia
                 repository.getNoteById(id)?.let { note ->
                     val multimediaUris = repository.getMultimediaForNote(id)
+                    Log.d("NoteViewModel", "Multimedia para la nota $id: $multimediaUris")
                     _state.update { screenState ->
                         screenState.copy(
                             id = note.id,
@@ -57,26 +68,49 @@ class NoteViewModel @Inject constructor(
         }
     }
 
-
     fun onEvent(event: NoteEvent) {
         when (event) {
             is NoteEvent.ContentChange -> {
                 _state.update { it.copy(content = event.value) }
             }
+
             is NoteEvent.TipoCambio -> {
                 _state.update { it.copy(tipo = event.value) }
             }
+
             is NoteEvent.MultimediaCambio -> {
                 // Agrega multimedia temporal
                 _state.update { it.copy(multimediaTemp = it.multimediaTemp + event.value) }
             }
+
             is NoteEvent.FechaCambio -> {
                 _state.update { it.copy(fecha = event.value) }
             }
+
             is NoteEvent.TitleChange -> {
                 _state.update { it.copy(title = event.value) }
             }
+
+            is NoteEvent.MultimediaDeCamera -> {
+                // Clasificar y agregar la multimedia tomada con la cámara a multimediaTemp
+                val multimediaUri = event.uri.toString()
+                val multimediaType = classifyMultimediaType(multimediaUri)
+                Log.d("NoteViewModel", "Multimedia tipo: $multimediaType, URI: $multimediaUri")
+                _state.update { it.copy(multimediaTemp = it.multimediaTemp + multimediaUri) }
+            }
+
+            // En el NoteViewModel
+            is NoteEvent.AddMultimedia -> {
+                val multimediaUri = event.uri.toString()
+                val multimediaType = classifyMultimediaType(multimediaUri)
+                Log.d("NoteViewModel", "Multimedia tipo: $multimediaType, URI: $multimediaUri")
+                _state.update { it.copy(multimediaTemp = it.multimediaTemp + multimediaUri) }
+            }
+
+
+
             NoteEvent.NavigateBack -> sendEvent(UiEvent.NavigateBack)
+
             NoteEvent.Save -> {
                 viewModelScope.launch {
                     val state = state.value
@@ -100,6 +134,7 @@ class NoteViewModel @Inject constructor(
                     sendEvent(UiEvent.NavigateBack)
                 }
             }
+
             NoteEvent.DeleteNote -> {
                 viewModelScope.launch {
                     val state = state.value
@@ -119,3 +154,4 @@ class NoteViewModel @Inject constructor(
         }
     }
 }
+

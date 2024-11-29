@@ -46,19 +46,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import java.io.File
+import android.graphics.BitmapFactory
+import coil.compose.rememberImagePainter
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-// Agregar una sección en NoteScreen para mostrar multimedia
 @Composable
 fun NoteScreen(
     estadoFecha: EstadoFecha,
     alarmScheduler: AlarmScheduler,
     state: NoteState,
     onEvent: (NoteEvent) -> Unit,
-    navController: NavController // Acepta navController como parámetro
+    navController: NavController
 ) {
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -81,7 +82,7 @@ fun NoteScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(rememberScrollState()) // Habilitar scroll vertical
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 15.dp, vertical = 15.dp),
         ) {
             BotonD()
@@ -90,12 +91,19 @@ fun NoteScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 MultimediaPicker(onEvent)
-                CameraButton()
+                CameraButton { uri ->
+                    onEvent(NoteEvent.AddMultimedia(uri.toString()))
+                }
                 DatePickerFecha(estadoFecha, onEvent)
             }
-            AudioRecorderButton()
+            AudioRecorderButton { audioUri ->
+                onEvent(NoteEvent.AddMultimedia(audioUri))  // Pasar el URI al ViewModel
+            }
 
-            // Mostrar multimedia guardada
+            /// Combina las listas multimedia y multimediaTemp
+            val allMultimedia = state.multimedia + state.multimediaTemp
+
+            // Mostrar multimedia guardada (incluyendo la grabada)
             if (state.multimedia.isNotEmpty()) {
                 Text(text = "Multimedia Guardada:")
                 LazyRow(
@@ -106,20 +114,37 @@ fun NoteScreen(
                 ) {
                     items(state.multimedia) { multimediaUri ->
                         when {
-                            multimediaUri.startsWith("content://media/external/images") -> {
+                            multimediaUri.startsWith("file://") -> {
+                                // Para imágenes tomadas con la cámara
+                                val file = File(multimediaUri.removePrefix("file://"))
+                                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
                                 androidx.compose.foundation.Image(
-                                    painter = rememberAsyncImagePainter(model = multimediaUri),
+                                    painter = rememberImagePainter(bitmap),
                                     contentDescription = "Imagen de la nota",
                                     modifier = Modifier
                                         .size(100.dp)
                                         .padding(5.dp)
                                         .clickable {
                                             navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
-
+                                        }
+                                )
+                            }
+                            multimediaUri.startsWith("content://media/external/images") -> {
+                                // Para imágenes de la galería
+                                androidx.compose.foundation.Image(
+                                    painter = rememberAsyncImagePainter(model = multimediaUri),
+                                    contentDescription = "Imagen de la galería",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(5.dp)
+                                        .clickable {
+                                            navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
                                         }
                                 )
                             }
                             multimediaUri.startsWith("content://media/external/video") -> {
+                                // Para videos
                                 Icon(
                                     imageVector = Icons.Filled.Movie,
                                     contentDescription = "Video",
@@ -127,11 +152,11 @@ fun NoteScreen(
                                         .size(50.dp)
                                         .clickable {
                                             navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
-
                                         }
                                 )
                             }
-                            multimediaUri.startsWith("content://media/external/audio") -> {
+                            multimediaUri.startsWith("content://media/external/audio") || multimediaUri.endsWith(".3gp") -> {
+                                // Para audios (se incluye una extensión común para grabaciones de voz, por ejemplo)
                                 Icon(
                                     imageVector = Icons.Filled.AudioFile,
                                     contentDescription = "Audio",
@@ -139,47 +164,15 @@ fun NoteScreen(
                                         .size(50.dp)
                                         .clickable {
                                             navController.navigate("media_viewer/${Uri.encode(multimediaUri)}")
-
                                         }
                                 )
                             }
                         }
                     }
                 }
-
             }
 
-            // Mostrar multimedia temporal
-            if (state.multimediaTemp.isNotEmpty()) {
-                Text(text = "Multimedia Temporal:")
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(state.multimediaTemp) { multimediaUri ->
-                        when {
-                            multimediaUri.startsWith("content://media/external/images") -> {
-                                androidx.compose.foundation.Image(
-                                    painter = rememberAsyncImagePainter(model = multimediaUri),
-                                    contentDescription = "Nueva imagen",
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                        .padding(5.dp)
-                                )
-                            }
-                            multimediaUri.startsWith("content://media/external/video") -> {
-                                Icon(
-                                    imageVector = Icons.Filled.Movie,
-                                    contentDescription = "Nuevo video",
-                                    modifier = Modifier.size(50.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+
 
             // Campos de texto
             OutlinedTextField(
@@ -218,18 +211,10 @@ fun NoteScreen(
     }
 }
 
-@Composable
-fun onMediaClick(uri: String) {
-    val intent = Intent(Intent.ACTION_VIEW).apply {
-        setDataAndType(Uri.parse(uri), getMimeType(uri))
-    }
-    LocalContext.current.startActivity(intent)
-}
-
 // Determinar el tipo MIME del archivo
 fun getMimeType(uri: String): String {
     return when {
-        uri.endsWith(".jpg") || uri.endsWith(".png") -> "image/*"
+        uri.endsWith(".jpg") || uri.endsWith(".jpg") -> "image/*"
         uri.endsWith(".mp4") -> "video/*"
         uri.endsWith(".mp3") -> "audio/*"
         else -> "*/*"

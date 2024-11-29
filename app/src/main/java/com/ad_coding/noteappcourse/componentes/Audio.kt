@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import java.io.File
 
 @Composable
-fun AudioRecorderButton() {
+fun AudioRecorderButton(onAudioRecorded: (String) -> Unit) {  // Agregar el callback
     val context = LocalContext.current
     var isRecording by remember { mutableStateOf(false) }
     var hasPermission by remember { mutableStateOf(false) }
@@ -67,6 +67,8 @@ fun AudioRecorderButton() {
                 reset()
             }
             isRecording = false
+            // Llamar al callback pasando el URI del archivo grabado
+            audioFiles.lastOrNull()?.absolutePath?.let { onAudioRecorded(it) }
             Log.d("AudioRecorder", "Grabación detenida")
         } catch (e: Exception) {
             Log.e("AudioRecorder", "Error al detener la grabación", e)
@@ -135,4 +137,5 @@ fun AudioRecorderButton() {
         }
     }
 }
+
 
