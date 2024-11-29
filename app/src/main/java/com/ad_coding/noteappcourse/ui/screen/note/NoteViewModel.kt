@@ -35,12 +35,13 @@ class NoteViewModel @Inject constructor(
     }
 
     // Función para clasificar el tipo de multimedia
-    private fun classifyMultimediaType(uri: String): String {
+    fun classifyMultimediaType(uri: String): String {
         return when {
-            uri.startsWith("content://media/external/images") -> "image"
-            uri.startsWith("content://media/external/video") -> "video"
-            uri.startsWith("content://media/external/audio") -> "audio"
-            else -> "unknown"
+            uri.endsWith(".mp3", true) -> "audio"
+            uri.endsWith(".3gp", true) -> "audio"  // También agregamos .3gp como tipo de audio
+            uri.endsWith(".mp4", true) -> "video"
+            uri.endsWith(".jpg", true) || uri.endsWith(".png", true) -> "image"
+            else -> "unknown"  // Tipo desconocido por defecto
         }
     }
 

@@ -87,7 +87,7 @@ class NoteRepositoryImpl(
         return when {
             uri.endsWith(".jpg", true) || uri.endsWith(".png", true) || uri.endsWith(".jpeg", true) -> "image"
             uri.endsWith(".mp4", true) || uri.endsWith(".mkv", true) || uri.endsWith(".avi", true) -> "video"
-            uri.endsWith(".mp3", true) || uri.endsWith(".wav", true) || uri.endsWith(".aac", true) -> "audio"
+            uri.endsWith(".mp3", true) || uri.endsWith(".wav", true) || uri.endsWith(".aac", true) || uri.endsWith(".3gp", true) -> "audio"
             uri.startsWith("content://media/external/images") -> "image"
             uri.startsWith("content://media/external/video") -> "video"
             uri.startsWith("content://media/external/audio") -> "audio"
