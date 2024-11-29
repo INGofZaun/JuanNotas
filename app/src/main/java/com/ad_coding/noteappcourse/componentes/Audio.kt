@@ -22,10 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.ad_coding.noteappcourse.ui.screen.note.NoteViewModel  // Agregado el import
+import com.ad_coding.noteappcourse.ui.screen.note.NoteEvent  // Agregado el import
 import java.io.File
+import android.net.Uri
 
 @Composable
-fun AudioRecorderButton() {
+fun AudioRecorderButton(viewModel: NoteViewModel) {
     val context = LocalContext.current
     var isRecording by remember { mutableStateOf(false) }
     var hasPermission by remember { mutableStateOf(false) }
@@ -67,6 +70,10 @@ fun AudioRecorderButton() {
                 reset()
             }
             isRecording = false
+            // Convertir el String URI a Uri antes de pasarlo al ViewModel
+            val audioFileUri = audioFiles.last().toURI().toString()
+            val uri = Uri.parse(audioFileUri)  // Conversión a Uri
+            viewModel.onEvent(NoteEvent.AddMultimedia(uri))  // Ahora pasamos el Uri
             Log.d("AudioRecorder", "Grabación detenida")
         } catch (e: Exception) {
             Log.e("AudioRecorder", "Error al detener la grabación", e)
@@ -135,4 +142,3 @@ fun AudioRecorderButton() {
         }
     }
 }
-

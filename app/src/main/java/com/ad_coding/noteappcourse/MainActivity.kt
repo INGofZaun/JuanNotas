@@ -97,8 +97,9 @@ class MainActivity : ComponentActivity() {
                             estadoFecha = estadoFecha,
                             alarmScheduler = AlarmSchedulerImpl(applicationContext),
                             state = state,
-                            onEvent = viewModel::onEvent,
-                            navController = navController
+                            onEvent = viewModel::onEvent, // Pasando onEvent desde el ViewModel
+                            navController = navController,
+                            viewModel = viewModel // Pasando el ViewModel
                         )
 
                     }

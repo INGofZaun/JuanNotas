@@ -60,7 +60,8 @@ fun NoteScreen(
     alarmScheduler: AlarmScheduler,
     state: NoteState,
     onEvent: (NoteEvent) -> Unit,
-    navController: NavController // Acepta navController como parámetro
+    navController: NavController,
+    viewModel: NoteViewModel // Asegúrate de aceptar el viewModel aquí
 ) {
     Scaffold(
         topBar = {
@@ -79,7 +80,6 @@ fun NoteScreen(
             )
         }
     ) { padding ->
-        // Hacer que el contenido sea desplazable
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -87,7 +87,9 @@ fun NoteScreen(
                 .verticalScroll(rememberScrollState()) // Habilitar scroll vertical
                 .padding(horizontal = 15.dp, vertical = 15.dp),
         ) {
-            BotonD()
+            // Aquí pasamos el viewModel a AudioRecorderButton
+            AudioRecorderButton(viewModel = viewModel)
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -99,7 +101,6 @@ fun NoteScreen(
                 }
                 DatePickerFecha(estadoFecha, onEvent)
             }
-            AudioRecorderButton()
 
             // Mostrar multimedia guardada
             if (state.multimedia.isNotEmpty()) {
@@ -248,6 +249,7 @@ fun NoteScreen(
         }
     }
 }
+
 
 
 
