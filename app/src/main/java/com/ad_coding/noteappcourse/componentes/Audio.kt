@@ -22,10 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.ad_coding.noteappcourse.ui.screen.note.NoteViewModel  // Agregado el import
+import com.ad_coding.noteappcourse.ui.screen.note.NoteEvent  // Agregado el import
 import java.io.File
+import android.net.Uri
 
 @Composable
+<<<<<<< HEAD
 fun AudioRecorderButton(onAudioRecorded: (String) -> Unit) {  // Agregar el callback
+=======
+fun AudioRecorderButton(viewModel: NoteViewModel) {
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
     val context = LocalContext.current
     var isRecording by remember { mutableStateOf(false) }
     var hasPermission by remember { mutableStateOf(false) }
@@ -67,8 +74,15 @@ fun AudioRecorderButton(onAudioRecorded: (String) -> Unit) {  // Agregar el call
                 reset()
             }
             isRecording = false
+<<<<<<< HEAD
             // Llamar al callback pasando el URI del archivo grabado
             audioFiles.lastOrNull()?.absolutePath?.let { onAudioRecorded(it) }
+=======
+            // Convertir el String URI a Uri antes de pasarlo al ViewModel
+            val audioFileUri = audioFiles.last().toURI().toString()
+            val uri = Uri.parse(audioFileUri)  // Conversión a Uri
+            viewModel.onEvent(NoteEvent.AddMultimedia(uri))  // Ahora pasamos el Uri
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
             Log.d("AudioRecorder", "Grabación detenida")
         } catch (e: Exception) {
             Log.e("AudioRecorder", "Error al detener la grabación", e)
@@ -137,5 +151,8 @@ fun AudioRecorderButton(onAudioRecorded: (String) -> Unit) {  // Agregar el call
         }
     }
 }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36

@@ -49,6 +49,11 @@ import androidx.navigation.NavController
 import java.io.File
 import android.graphics.BitmapFactory
 import coil.compose.rememberImagePainter
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +63,12 @@ fun NoteScreen(
     alarmScheduler: AlarmScheduler,
     state: NoteState,
     onEvent: (NoteEvent) -> Unit,
+<<<<<<< HEAD
     navController: NavController
+=======
+    navController: NavController,
+    viewModel: NoteViewModel // Asegúrate de aceptar el viewModel aquí
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 ) {
     Scaffold(
         topBar = {
@@ -77,7 +87,6 @@ fun NoteScreen(
             )
         }
     ) { padding ->
-        // Hacer que el contenido sea desplazable
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,13 +94,16 @@ fun NoteScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 15.dp, vertical = 15.dp),
         ) {
-            BotonD()
+            // Aquí pasamos el viewModel a AudioRecorderButton
+            AudioRecorderButton(viewModel = viewModel)
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 MultimediaPicker(onEvent)
                 CameraButton { uri ->
+<<<<<<< HEAD
                     onEvent(NoteEvent.AddMultimedia(uri.toString()))
                 }
                 DatePickerFecha(estadoFecha, onEvent)
@@ -99,6 +111,13 @@ fun NoteScreen(
             AudioRecorderButton { audioUri ->
                 onEvent(NoteEvent.AddMultimedia(audioUri))  // Pasar el URI al ViewModel
             }
+=======
+                    // Esta es la función que se ejecutará cuando se capture un multimedia
+                    onEvent(NoteEvent.AddMultimedia(uri))
+                }
+                DatePickerFecha(estadoFecha, onEvent)
+            }
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 
             /// Combina las listas multimedia y multimediaTemp
             val allMultimedia = state.multimedia + state.multimediaTemp
@@ -115,7 +134,11 @@ fun NoteScreen(
                     items(state.multimedia) { multimediaUri ->
                         when {
                             multimediaUri.startsWith("file://") -> {
+<<<<<<< HEAD
                                 // Para imágenes tomadas con la cámara
+=======
+                                // Para imágenes capturadas con la cámara
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
                                 val file = File(multimediaUri.removePrefix("file://"))
                                 val bitmap = BitmapFactory.decodeFile(file.absolutePath)
 
@@ -172,7 +195,53 @@ fun NoteScreen(
                 }
             }
 
+<<<<<<< HEAD
 
+=======
+            // Mostrar multimedia temporal
+            if (state.multimediaTemp.isNotEmpty()) {
+                Text(text = "Multimedia Temporal:")
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(state.multimediaTemp) { multimediaUri ->
+                        when {
+                            multimediaUri.startsWith("file://") -> {
+                                val file = File(multimediaUri.removePrefix("file://"))
+                                val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
+                                androidx.compose.foundation.Image(
+                                    painter = rememberImagePainter(bitmap),
+                                    contentDescription = "Nueva imagen",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(5.dp)
+                                )
+                            }
+                            multimediaUri.startsWith("content://media/external/images") -> {
+                                androidx.compose.foundation.Image(
+                                    painter = rememberAsyncImagePainter(model = multimediaUri),
+                                    contentDescription = "Nueva imagen",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .padding(5.dp)
+                                )
+                            }
+                            multimediaUri.startsWith("content://media/external/video") -> {
+                                Icon(
+                                    imageVector = Icons.Filled.Movie,
+                                    contentDescription = "Nuevo video",
+                                    modifier = Modifier.size(50.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 
             // Campos de texto
             OutlinedTextField(
@@ -211,6 +280,21 @@ fun NoteScreen(
     }
 }
 
+<<<<<<< HEAD
+=======
+
+
+
+
+@Composable
+fun onMediaClick(uri: String) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(Uri.parse(uri), getMimeType(uri))
+    }
+    LocalContext.current.startActivity(intent)
+}
+
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 // Determinar el tipo MIME del archivo
 fun getMimeType(uri: String): String {
     return when {

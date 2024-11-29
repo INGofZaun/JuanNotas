@@ -35,12 +35,22 @@ class NoteViewModel @Inject constructor(
     }
 
     // Función para clasificar el tipo de multimedia
+<<<<<<< HEAD
     private fun classifyMultimediaType(uri: String): String {
         return when {
             uri.startsWith("content://media/external/images") -> "image"
             uri.startsWith("content://media/external/video") -> "video"
             uri.startsWith("content://media/external/audio") -> "audio"
             else -> "unknown"
+=======
+    fun classifyMultimediaType(uri: String): String {
+        return when {
+            uri.endsWith(".mp3", true) -> "audio"
+            uri.endsWith(".3gp", true) -> "audio"  // También agregamos .3gp como tipo de audio
+            uri.endsWith(".mp4", true) -> "video"
+            uri.endsWith(".jpg", true) || uri.endsWith(".png", true) -> "image"
+            else -> "unknown"  // Tipo desconocido por defecto
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
         }
     }
 
@@ -99,16 +109,24 @@ class NoteViewModel @Inject constructor(
                 _state.update { it.copy(multimediaTemp = it.multimediaTemp + multimediaUri) }
             }
 
+<<<<<<< HEAD
             // En el NoteViewModel
             is NoteEvent.AddMultimedia -> {
+=======
+            is NoteEvent.AddMultimedia -> {
+                // Clasificar y agregar multimedia desde el evento AddMultimedia
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
                 val multimediaUri = event.uri.toString()
                 val multimediaType = classifyMultimediaType(multimediaUri)
                 Log.d("NoteViewModel", "Multimedia tipo: $multimediaType, URI: $multimediaUri")
                 _state.update { it.copy(multimediaTemp = it.multimediaTemp + multimediaUri) }
             }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
             NoteEvent.NavigateBack -> sendEvent(UiEvent.NavigateBack)
 
             NoteEvent.Save -> {

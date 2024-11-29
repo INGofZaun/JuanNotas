@@ -53,16 +53,27 @@ class NoteRepositoryImpl(
 
     override suspend fun getNoteById(id: Int): Note? {
         return noteDao.getNoteById(id)?.asExternalModel()?.also { note ->
+<<<<<<< HEAD
             note.multimedia = getMultimediaForNote(id) // Aquí se asegura que se carguen los multimedia de la base de datos
         }
     }
 
+=======
+            note.multimedia = getMultimediaForNote(id) // Cambié el nombre de la función aquí
+        }
+    }
+
+    // Corregido el nombre de la función para que coincida con la interfaz
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
     override suspend fun getMultimediaForNote(idNota: Int): List<String> {
         val multimedia = multimediaDao.getMultimediaForNota(idNota).toUriList()
         Log.d("NoteRepositoryImpl", "Multimedia loaded for note $idNota: $multimedia")
         return multimedia
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 
     private suspend fun saveMultimediaForNote(idNota: Int, uris: List<String>) {
         multimediaDao.deleteAllForNota(idNota)
@@ -73,15 +84,21 @@ class NoteRepositoryImpl(
             Log.d("NoteRepositoryImpl", "URI: $uri clasificado como tipo: $type")
             MultimediaEntity(uri = uri, tipo = type, idNota = idNota) // Aseguramos que el constructor reciba 'idNota' y 'tipo'
         }
+<<<<<<< HEAD
         Log.d("NoteRepositoryImpl", "Guardando multimedia para la nota $idNota: $uris") // Aquí añades un Log adicional
+=======
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 
         multimediaEntities.forEach {
             multimediaDao.insert(it)
         }
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
     // Función para clasificar el tipo de multimedia (imagen, video, audio, etc.)
     fun classifyMultimediaType(uri: String): String {
         Log.d("classifyMultimediaType", "Evaluando URI: $uri")
@@ -90,13 +107,20 @@ class NoteRepositoryImpl(
         return when {
             uri.endsWith(".jpg", true) || uri.endsWith(".png", true) || uri.endsWith(".jpeg", true) -> "image"
             uri.endsWith(".mp4", true) || uri.endsWith(".mkv", true) || uri.endsWith(".avi", true) -> "video"
+<<<<<<< HEAD
             uri.endsWith(".mp3", true) || uri.endsWith(".wav", true)
                     || uri.endsWith(".m4a", true) || uri.endsWith(".3gp", true) -> "audio"
+=======
+            uri.endsWith(".mp3", true) || uri.endsWith(".wav", true) || uri.endsWith(".aac", true) || uri.endsWith(".3gp", true) -> "audio"
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
             uri.startsWith("content://media/external/images") -> "image"
             uri.startsWith("content://media/external/video") -> "video"
             uri.startsWith("content://media/external/audio") -> "audio"
             else -> "unknown"
         }
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1ddbf024e2fdd11cf8892dad9507b98a17433e36
 }
